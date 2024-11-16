@@ -1,0 +1,101 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+
+// Struct to represent a person
+typedef struct {
+    char name[50];
+} Person;
+
+// Struct to represent a child
+typedef struct {
+    char name[50];
+    bool isStepChild;
+    char parents[2][50];
+} Child;
+
+// Struct to represent a married couple
+typedef struct {
+    Person partner1;
+    Person partner2;
+    Child children[10]; // Assume a maximum of 10 children
+    int totalChildren;
+} MarriedCouple;
+
+// Function prototypes
+bool hasChildren(MarriedCouple *couple);
+void adoptChild(MarriedCouple *couple, char *childName, bool isStepChild);
+void printParents(MarriedCouple *couple, char *childName);
+void checkIfStepChild(MarriedCouple *couple, char *childName);
+
+// Function to check if the couple has children
+bool hasChildren(MarriedCouple *couple) {
+    return couple->totalChildren > 0;
+}
+
+// Function to adopt a child
+void adoptChild(MarriedCouple *couple, char *childName, bool isStepChild) {
+    if (couple->totalChildren >= 10) {
+        printf("Cannot adopt more children. Maximum limit reached.\n");
+        return;
+    }
+
+    Child newChild;
+    strcpy(newChild.name, childName);
+    newChild.isStepChild = isStepChild;
+    strcpy(newChild.parents[0], couple->partner1.name);
+    strcpy(newChild.parents[1], couple->partner2.name);
+
+    couple->children[couple->totalChildren] = newChild;
+    couple->totalChildren++;
+
+    printf("%s has been adopted by %s and %s.\n", childName, couple->partner1.name, couple->partner2.name);
+}
+
+// Function to display the parents of a specific child
+void printParents(MarriedCouple *couple, char *childName) {
+    for (int i = 0; i < couple->totalChildren; i++) {
+        if (strcmp(couple->children[i].name, childName) == 0) {
+            printf("Parents of %s: %s and %s\n", childName, couple->children[i].parents[0], couple->children[i].parents[1]);
+            return;
+        }
+    }
+    printf("No child named %s found.\n", childName);
+}
+
+// Function to check if a child is a stepchild
+void checkIfStepChild(MarriedCouple *couple, char *childName) {
+    for (int i = 0; i < couple->totalChildren; i++) {
+        if (strcmp(couple->children[i].name, childName) == 0) {
+            printf("Is %s a stepchild? %s\n", childName, couple->children[i].isStepChild ? "Yes" : "No");
+            return;
+        }
+    }
+    printf("No child named %s found.\n", childName);
+}
+
+// Main function
+int main() {
+    // Initialize married couple
+    MarriedCouple couple = {{"John"}, {"Jane"}, {}, 0};
+
+    // Check if the couple has children
+    printf("Has children: %s\n", hasChildren(&couple) ? "Yes" : "No");
+
+    // Adopt a child
+    adoptChild(&couple, "Ella", false);
+
+    // Check again if the couple has children
+    printf("Has children: %s\n", hasChildren(&couple) ? "Yes" : "No");
+
+    // Adopt a stepchild
+    adoptChild(&couple, "Liam", true);
+
+    // Print parents of a specific child
+    printParents(&couple, "Ella");
+
+    // Check if a child is a stepchild
+    checkIfStepChild(&couple, "Liam");
+
+    return 0;
+}
